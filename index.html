@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .contact-card {
+                @apply bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105;
+            }
+            .contact-image {
+                @apply w-32 h-32 object-cover rounded-full border-2 border-blue-500;
+            }
+            .contact-info {
+                @apply p-4;
+            }
+            .contact-name {
+                @apply text-xl font-semibold text-gray-800;
+            }
+            .contact-phone {
+                @apply text-xl text-gray-600;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen py-8">
+    <div class="container mx-auto px-4">
+        <h1 class="text-3xl font-bold text-center mb-8 text-blue-600">Contact List</h1>
+        <div class="mb-6 relative">
+            <input type="text" id="search" placeholder="Search contacts..." class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-3.5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="contact-card flex items-center">
+                <img src="./nitin.jpg" class="contact-image">
+                <div class="contact-info">
+                    <h2 class="contact-name">Nitin</h2>
+                    <p class="contact-phone"><a href="tel:9991760651">9991760651</a></p>
+                </div>
+            </div>
+            <div class="contact-card flex items-center">
+                <img src="./manju.jpg" class="contact-image">
+                <div class="contact-info">
+                    <h2 class="contact-name">Manju</h2>
+                    <p class="contact-phone"><a href="tel:8818035259">8818035259</a></p>
+                </div>
+            </div>
+            <div class="contact-card flex items-center">
+                <img src="./sachin.jpg" class="contact-image">
+                <div class="contact-info">
+                    <h2 class="contact-name">Sachin</h2>
+                    <p class="contact-phone"><a href="tel:7777070432">7777070432</a></p>
+                </div>
+            </div>
+            <div class="contact-card flex items-center">
+                <img src="./nidhi.jpg" class="contact-image">
+                <div class="contact-info">
+                    <h2 class="contact-name">Nidhi</h2>
+                    <p class="contact-phone">8570960273</p>
+                </div>
+            </div>
+
+            <div class="contact-card flex items-center">
+                <img src="./moni.jpg" class="contact-image">
+                <div class="contact-info">
+                    <h2 class="contact-name">Moni</h2>
+                    <p class="contact-phone"><a href="tel:9729409348">9729409348</a></p>
+                </div>
+            </div>
+            <div class="contact-card flex items-center">
+                <img src="./monu.png" class="contact-image">
+                <div class="contact-info">
+                    <h2 class="contact-name">Monu</h2>
+                    <p class="contact-phone">9813629096</p>
+                </div>
+            </div>
+            <div class="contact-card flex items-center">
+                <img src="#" class="contact-image">
+                <div class="contact-info">
+                    <h2 class="contact-name">Balwan</h2>
+                    <p class="contact-phone"><a href="tel:9817220216">9817220216</a></p>
+                </div>
+            </div>
+            <div class="contact-card flex items-center">
+                <img src="#" class="contact-image">
+                <div class="contact-info">
+                    <h2 class="contact-name">Suresh</h2>
+                    <p class="contact-phone"><a href="tel:9050463190">9050463190</a></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        document.getElementById('search').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const contacts = document.querySelectorAll('.contact-card');
+            contacts.forEach(contact => {
+                const name = contact.querySelector('.contact-name').textContent.toLowerCase();
+                const phone = contact.querySelector('.contact-phone').textContent;
+                if (name.includes(searchTerm) || phone.includes(searchTerm)) {
+                    contact.style.display = '';
+                } else {
+                    contact.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
