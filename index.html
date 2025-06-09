@@ -3,149 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact List</title>
+    <title>Enhanced Contact List</title>
+    <!-- TailwindCSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .contact-card {
-                @apply bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105;
-            }
-            .contact-image {
-                @apply w-32 h-32 object-cover rounded-full border-2 border-blue-500;
-            }
-            .contact-info {
-                @apply p-4;
-            }
-            .contact-name {
-                @apply text-xl font-semibold text-gray-800;
-            }
-            .contact-phone {
-                @apply text-xl text-gray-600;
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'card': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                }
             }
         }
-
-        .edit{
-            filter: brightness(1.9) contrast(1);
+    </script>
+    <style>
+        .contact-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-out, transform 0.3s ease-out;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        .contact-details.active {
+            max-height: 200px;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.active {
+            transform: rotate(180deg);
+        }
+        body {
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(14, 165, 233, 0.05) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(14, 165, 233, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen py-8">
-    <div class="container mx-auto px-4">
-        <h1 class="text-3xl font-bold text-center mb-8 text-blue-600">Contact List</h1>
-        <div class="mb-6 relative">
-            <input type="text" id="search" placeholder="Search contacts..." class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-3.5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-            </svg>
+<body class="min-h-screen py-8 px-4">
+    <div class="container mx-auto max-w-md">
+        <div class="bg-white rounded-2xl shadow-card p-6 mb-6">
+            <h1 class="text-3xl font-bold text-center text-secondary-800 mb-2">My Contacts</h1>
+            <p class="text-center text-secondary-500 mb-6">Keep track of all your family contacts</p>
+            
+            <!-- Search Bar -->
+            <div class="relative mb-6">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                    <svg class="w-5 h-5 text-secondary-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                    </svg>
+                </div>
+                <input type="text" id="search-input" class="block w-full p-4 pl-12 text-secondary-800 border border-secondary-200 rounded-xl bg-secondary-50 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200" placeholder="Search contacts..." onkeyup="searchContacts()">
+            </div>
+            
+            <!-- Filter by Owner -->
+            <div class="flex flex-wrap gap-2 mb-6 justify-center">
+                <button onclick="filterByOwner('all')" class="px-4 py-2 bg-primary-500 text-white rounded-full text-sm font-medium hover:bg-primary-600 transition-colors duration-200 active-filter">All</button>
+                <button onclick="filterByOwner('Nitin')" class="px-4 py-2 bg-secondary-100 text-secondary-700 rounded-full text-sm font-medium hover:bg-secondary-200 transition-colors duration-200">Nitin</button>
+                <button onclick="filterByOwner('Sachin')" class="px-4 py-2 bg-secondary-100 text-secondary-700 rounded-full text-sm font-medium hover:bg-secondary-200 transition-colors duration-200">Sachin</button>
+                <button onclick="filterByOwner('Ram')" class="px-4 py-2 bg-secondary-100 text-secondary-700 rounded-full text-sm font-medium hover:bg-secondary-200 transition-colors duration-200">Ram</button>
+            </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="contact-card flex items-center">
-                <img src="./nitin.jpg" class="contact-image">
-                <div class="contact-info">
-                    <h2 class="contact-name">Nitin</h2>
-                    <p class="contact-phone"><a href="tel:9991760651">9991760651</a></p>
-                </div>
-            </div>
-            <div class="contact-card flex items-center">
-                <img src="./manju.jpg" class="contact-image">
-                <div class="contact-info">
-                    <h2 class="contact-name">Manju</h2>
-                    <p class="contact-phone"><a href="tel:8818035259">8818035259</a></p>
-                </div>
-            </div>
-            <div class="contact-card flex items-center">
-                <img src="./sachin.jpg" class="contact-image">
-                <div class="contact-info">
-                    <h2 class="contact-name">Sachin</h2>
-                    <p class="contact-phone"><a href="tel:7777070432">7777070432</a></p>
-                </div>
-            </div>
-            <div class="contact-card flex items-center">
-                <img src="./nidhi.jpg" class="contact-image">
-                <div class="contact-info">
-                    <h2 class="contact-name">Nidhi</h2>
-                    <p class="contact-phone"><a href="tel:8570960273">8570960273</a></p>
-                </div>
-            </div>
-
-            <div class="contact-card flex items-center">
-                <img src="./moni.jpg" class="contact-image">
-                <div class="contact-info">
-                    <h2 class="contact-name">Moni</h2>
-                    <p class="contact-phone"><a href="tel:9729409348">9729409348</a></p>
-                </div>
-            </div>
-            <div class="contact-card flex items-center">
-                <img src="./monu.png" class="contact-image">
-                <div class="contact-info">
-                    <h2 class="contact-name">Monu</h2>
-                    <p class="contact-phone"><a href="tel:9813629096">9813629096</a></p>
-                </div>
-            </div>
-            <div class="contact-card flex items-center">
-                <img src="./golu.png" class="contact-image">
-                <div class="contact-info">
-                    <h2 class="contact-name">Golu</h2>
-                    <p class="contact-phone"><a href="tel:9992442905">9992442905</a></p>
-                </div>
-            </div>
-            <div class="contact-card flex items-center">
-                <img src="#" class="contact-image">
-                <div class="contact-info">
-                    <h2 class="contact-name">Balwan</h2>
-                    <p class="contact-phone"><a href="tel:9817220216">9817220216</a></p>
-                </div>
-            </div>
-            <div class="contact-card flex items-center">
-                <img src="#" class="contact-image">
-                <div class="contact-info">
-                    <h2 class="contact-name">Suresh</h2>
-                    <p class="contact-phone"><a href="tel:9050463190">9050463190</a></p>
-                </div>
-            </div>
-            <div class="contact-card flex items-center">
-                <img src="./neeraj.jpeg" class="contact-image">
-                <div class="contact-info">
-                    <h2 class="contact-name">Neeraj</h2>
-                    <p class="contact-phone"><a href="tel:9812650065">9812650065</a></p>
-                </div>
-            </div>
-            <div class="contact-card flex items-center">
-                <img src="./ashish.jpeg" class="contact-image">
-                <div class="contact-info">
-                    <h2 class="contact-name">Ashish</h2>
-                    <p class="contact-phone"><a href="tel:9729302400">9729302400</a></p>
-                </div>
-            </div>
-            <div class="contact-card flex items-center">
-                <img src="./satu.png" class="contact-image">
-                <div class="contact-info">
-                    <h2 class="contact-name">Satyanarayan</h2>
-                    <p class="contact-phone"><a href="tel:8053970919">8053970919</a></p>
-                </div>
-            </div>
-            <div class="contact-card flex items-center">
-                <img src="./shanker.png" class="contact-image edit">
-                <div class="contact-info">
-                    <h2 class="contact-name">Shanker</h2>
-                    <p class="contact-phone"><a href="tel:9416824793">9416824793</a></p>
-                </div>
-            </div>
+        
+        <!-- Contact List -->
+        <div id="contact-list" class="space-y-4">
+            <!-- Contacts will be populated here -->
         </div>
     </div>
+
     <script>
-        document.getElementById('search').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const contacts = document.querySelectorAll('.contact-card');
-            contacts.forEach(contact => {
-                const name = contact.querySelector('.contact-name').textContent.toLowerCase();
-                const phone = contact.querySelector('.contact-phone').textContent;
-                if (name.includes(searchTerm) || phone.includes(searchTerm)) {
-                    contact.style.display = '';
-                } else {
-                    contact.style.display = 'none';
-                }
+        // Sample contact data with owner field
+        const contacts = [
+            { id: 1, name: "Nitin", phone: "9991760651", image: "./nitin.jpg", owner: "Sachin" },
+            { id: 2, name: "Manju", phone: "8818035259", image: "./manju.jpg", owner: "Sachin" },
+            { id: 3, name: "Sachin", phone: "7777070432", image: "./sachin.jpg", owner: "Sachin" },
+            { id: 4, name: "Nidhi", phone: "8570960273", image: "./nidhi.jpg", owner: "Sachin" },
+            { id: 5, name: "Moni", phone: "9729409348", image: "./moni.jpg", owner: "Sachin" },
+            { id: 6, name: "Monu", phone: "9813629096", image: "./monu.png", owner: "Sachin" },
+            { id: 7, name: "Golu", phone: "9992442905", image: "./golu.png", owner: "Sachin" },
+            { id: 8, name: "Balwan", phone: "9817220216", image: "#", owner: "Sachin" },
+            { id: 9, name: "Suresh", phone: "9050463190", image: "#", owner: "Sachin" },
+            { id: 10, name: "Neeraj", phone: "9812650065", image: "./neeraj.jpeg", owner: "Sachin" },
+            { id: 11, name: "Ashish", phone: "9729302400", image: "./ashish.jpeg", owner: "Sachin" },
+            { id: 12, name: "Satyanarayan", phone: "8053970919", image: "./satu.png", owner: "Sachin" },
+            { id: 13, name: "Shanker", phone: "9416824793", image: "./shanker.png", owner: "Sachin" }
+        ];
+
+        let currentFilter = 'all';
+        let searchTerm = '';
+
+        // Function to render contacts
+        function renderContacts() {
+            const contactList = document.getElementById('contact-list');
+            contactList.innerHTML = '';
+            
+            // Filter contacts based on search term and owner filter
+            const filteredContacts = contacts.filter(contact => {
+                const matchesSearch = contact.name.toLowerCase().includes(searchTerm) || 
+                                     contact.phone.toLowerCase().includes(searchTerm);
+                const matchesOwner = currentFilter === 'all' || contact.owner === currentFilter;
+                return matchesSearch && matchesOwner;
             });
+            
+            if (filteredContacts.length === 0) {
+                contactList.innerHTML = '<div class="bg-white rounded-xl shadow-soft p-8 text-center"><p class="text-secondary-500">No contacts found</p></div>';
+                return;
+            }
+            
+            filteredContacts.forEach(contact => {
+                const contactCard = document.createElement('div');
+                contactCard.className = 'bg-white rounded-xl shadow-soft overflow-hidden transition-all duration-200 hover:shadow-card';
+                
+                // Get owner badge color
+                let ownerColor;
+                switch(contact.owner) {
+                    case 'Nitin':
+                        ownerColor = 'bg-blue-100 text-blue-800';
+                        break;
+                    case 'Sachin':
+                        ownerColor = 'bg-green-100 text-green-800';
+                        break;
+                    case 'Ram':
+                        ownerColor = 'bg-purple-100 text-purple-800';
+                        break;
+                    default:
+                        ownerColor = 'bg-gray-100 text-gray-800';
+                }
+                
+                contactCard.innerHTML = `
+                    <div class="p-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <img class="h-20 w-20 rounded-full object-cover border-4 border-secondary-100" src="${contact.image}" alt="${contact.name}" loading="lazy">
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-xl font-semibold text-secondary-800">${contact.name}</h3>
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium ${ownerColor}">${contact.owner}'s</span>
+                                </div>
+                                <p class="text-secondary-500 mt-1">${contact.phone}</p>
+                                <div class="flex mt-3 space-x-2">
+                                    <button class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center text-sm" onclick="callContact(event, '${contact.phone}')">
+                                        <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                            <path fill="currentColor" d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"/>
+                                        </svg>
+                                        Call
+                                    </button>
+                                    <button class="bg-secondary-100 hover:bg-secondary-200 text-secondary-700 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center text-sm toggle-btn" onclick="toggleContact(event, ${contact.id})">
+                                        <span>More</span>
+                                        <svg class="w-4 h-4 ml-1 rotate-icon" id="icon-${contact.id}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                            <path fill="currentColor" d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="contact-details-${contact.id}" class="contact-details bg-secondary-50 border-t border-secondary-100">
+                        <div class="p-4 grid grid-cols-2 gap-3">
+                            <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-3 rounded-lg transition-colors duration-200 flex items-center justify-center" onclick="whatsappContact(event, '${contact.phone}')">
+                                <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                    <path fill="currentColor" d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+                                </svg>
+                                WhatsApp
+                            </button>
+                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-3 rounded-lg transition-colors duration-200 flex items-center justify-center" onclick="messageContact(event, '${contact.phone}')">
+                                <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="currentColor" d="M256 448c141.4 0 256-93.1 256-208S397.4 32 256 32S0 125.1 0 240c0 45.1 17.7 86.8 47.7 120.9c-1.9 24.5-11.4 46.3-21.4 62.9c-5.5 9.2-11.1 16.6-15.2 21.6c-2.1 2.5-3.7 4.4-4.9 5.7c-.6 .6-1 1.1-1.3 1.4l-.3 .3 0 0 0 0 0 0 0 0c-4.6 4.6-5.9 11.4-3.4 17.4c2.5 6 8.3 9.9 14.8 9.9c28.7 0 57.6-8.9 81.6-19.3c22.9-10 42.4-21.9 54.3-30.6c31.8 11.5 67 17.9 104.1 17.9zM128 208a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm128 0a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm96 32a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/>
+                                </svg>
+                                Message
+                            </button>
+                        </div>
+                    </div>
+                `;
+                contactList.appendChild(contactCard);
+            });
+        }
+
+        // Function to toggle contact details
+        function toggleContact(event, id) {
+            event.stopPropagation();
+            const contactDetails = document.getElementById(`contact-details-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+            contactDetails.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+
+        // Function to search contacts
+        function searchContacts() {
+            searchTerm = document.getElementById('search-input').value.toLowerCase();
+            renderContacts();
+        }
+
+        // Function to filter by owner
+        function filterByOwner(owner) {
+            currentFilter = owner;
+            
+            // Update active filter button
+            const filterButtons = document.querySelectorAll('.flex.flex-wrap.gap-2 button');
+            filterButtons.forEach(button => {
+                button.classList.remove('bg-primary-500', 'text-white');
+                button.classList.remove('active-filter');
+                button.classList.add('bg-secondary-100', 'text-secondary-700');
+            });
+            
+            event.target.classList.remove('bg-secondary-100', 'text-secondary-700');
+            event.target.classList.add('bg-primary-500', 'text-white', 'active-filter');
+            
+            renderContacts();
+        }
+
+        // Function to call a contact
+        function callContact(event, phone) {
+            event.stopPropagation();
+            window.location.href = `tel:${phone}`;
+        }
+
+        // Function to WhatsApp a contact
+        function whatsappContact(event, phone) {
+            event.stopPropagation();
+            // Remove spaces and special characters from phone number
+            const formattedPhone = phone.replace(/\s+/g, '').replace(/[()-]/g, '');
+            window.open(`https://wa.me/${formattedPhone}`, '_blank');
+        }
+
+        // Function to message a contact
+        function messageContact(event, phone) {
+            event.stopPropagation();
+            window.location.href = `sms:${phone}`;
+        }
+
+        // Initialize the contact list
+        document.addEventListener('DOMContentLoaded', () => {
+            renderContacts();
         });
     </script>
 </body>
