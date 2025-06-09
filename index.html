@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enhanced Contact List</title>
-    <!-- TailwindCSS CDN. -->
+    <!-- TailwindCSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -256,7 +256,7 @@
             event.stopPropagation();
             // Remove spaces and special characters from phone number
             const formattedPhone = phone.replace(/\s+/g, '').replace(/[()-]/g, '');
-            window.open(`https://wa.me/${formattedPhone}`, '_blank');
+            window.open(`https://wa.me/91${formattedPhone}`, '_blank');
         }
 
         // Function to message a contact
